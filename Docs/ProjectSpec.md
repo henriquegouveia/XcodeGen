@@ -329,10 +329,9 @@ A dependency can be one of a 3 types:
 - `target: name` - links to another target
 - `framework: path` - links to a framework
 - `carthage: name` - helper for linking to a Carthage framework
+- `sdkFramework: name` - links to a specific framework within the SDK root. Just the name must be provided without a `.framework` suffix
 
-**Embed options**:
-
-These only applied to `target` and `framework` dependencies.
+**Linking options**:
 
 - [ ] **embed**: **Bool** - Whether to embed the dependency. Defaults to true for application target and false for non application targets.
 - [ ] **link**: **Bool** - Whether to link the dependency. Defaults to `true` depending on the type of the dependency and the type of the target (e.g. static libraries will only link to executables by default).
@@ -363,6 +362,7 @@ targets:
       - target: MyFramework
       - framework: path/to/framework.framework
       - carthage: Result
+      - sdkFramework: Contacts
   MyFramework:
     type: framework
 ```

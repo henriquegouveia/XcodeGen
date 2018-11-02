@@ -14,6 +14,7 @@ public class PBXProjGenerator {
     var targetObjects: [String: PBXTarget] = [:]
     var targetAggregateObjects: [String: PBXAggregateTarget] = [:]
     var targetFileReferences: [String: PBXFileReference] = [:]
+    var sdkFrameworkFileReferences: [String: PBXFileReference] = [:]
 
     var carthageFrameworksByPlatform: [String: Set<PBXFileElement>] = [:]
     var frameworkFiles: [PBXFileElement] = []
@@ -522,6 +523,28 @@ public class PBXProjGenerator {
 
                 let buildPath = Path(dependency.reference).parent().string.quoted
                 frameworkBuildPaths.insert(buildPath)
+            case .sdkFramework:
+                let frameworkPath = Path("System/Library/Frameworks/\(dependency.reference).framework")
+
+                let fileReference: PBXFileReference
+                if let existingFileReferences = sdkFrameworkFileReferences[dependency.reference] {
+                    fileReference = existingFileReferences
+                } else {
+                    fileReference = addObject(
+                        PBXFileReference(sourceTree: .sdkRoot,
+                                         name: frameworkPath.lastComponent,
+                                         lastKnownFileType: Xcode.fileType(path: frameworkPath),
+                                         path: frameworkPath.string)
+                    )
+                    sdkFrameworkFileReferences[dependency.reference] = fileReference
+                    frameworkFiles.append(fileReference)
+                }
+
+                let buildFile = addObject(
+                    PBXBuildFile(file: fileReference,
+                                 settings: getDependencyFrameworkSettings(dependency: dependency))
+                )
+                targetFrameworkBuildFiles.append(buildFile)
 
             case .carthage:
                 guard target.type != .staticLibrary else { break }
@@ -943,6 +966,8 @@ public class PBXProjGenerator {
                 // don't want a dependency if it's going to be embedded or statically linked in a non-top level target
                 // in .target check we filter out targets that will embed all of their dependencies
                 switch dependency.type {
+                case .sdkFramework:
+                    dependencies[dependency.reference] = dependency
                 case .framework, .carthage:
                     if isTopLevel || dependency.embed == nil {
                         dependencies[dependency.reference] = dependency
