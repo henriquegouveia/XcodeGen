@@ -2,219 +2,404 @@
 1.11.2
 
 # SPEC
-aggregateTargets:
-  SuperTarget:
-    attributes:
-      CUSTOM: value
-    buildScripts:
-    - name: MyScript
-      script: echo "do the thing"
-    settings:
-      MY_SETTING: hello
-    targets:
-    - App_iOS
-    - Framework_iOS
-configFiles:
-  Test Debug: Configs/config.xcconfig
-configs:
-  Production Debug: debug
-  Production Release: release
-  Staging Debug: debug
-  Staging Release: release
-  Test Debug: debug
-  Test Release: release
-fileGroups:
-- Configs
-- FileGroup
-- SomeFile
-include:
-- environments.yml
-name: Project
-options:
-  bundleIdPrefix: com.project
-  deploymentTarget:
-    watchOS: 4e+0
-  groupSortPosition: top
-  indentWidth: 2
-  tabWidth: 2
-  transitivelyLinkDependencies: true
-  usesTabs: false
-schemes:
-  Framework:
-    build:
-      buildImplicitDependencies: false
-      parallelizeBuild: false
-      preActions:
-      - script: echo Starting Framework Build
-        settingsTarget: Framework_iOS
-      targets:
-        Framework_iOS: all
-    run:
-      commandLineArguments:
-        argument: true
-        argument.with.dot: true
-settings:
-  configs:
-    Staging:
-      BUNDLE_ID_SUFFIX: .staging
-    Test:
-      BUNDLE_ID_SUFFIX: .test
-targetTemplates:
-  MyTemplate:
-    scheme: {}
-targets:
-  App_iOS:
-    attributes:
-      ProvisioningStyle: Automatic
-    dependencies:
-    - target: Framework_iOS
-    - target: StaticLibrary_ObjC
-    - carthage: Alamofire
-    - target: App_watchOS
-    - target: iMessageApp
-    - framework: Vendor/SomeFramework.framework
-    platform: iOS
-    postbuildScripts:
-    - name: Strip Unused Architectures from Frameworks
-      path: scripts/strip-frameworks.sh
-      runOnlyWhenInstalling: true
-    - name: MyScript
-      script: 'echo "You ran a script!"
+{
+  "aggregateTargets" : {
+    "SuperTarget" : {
+      "attributes" : {
+        "CUSTOM" : "value"
+      },
+      "buildScripts" : [
+        {
+          "name" : "MyScript",
+          "script" : "echo \"do the thing\""
+        }
+      ],
+      "settings" : {
+        "MY_SETTING" : "hello"
+      },
+      "targets" : [
+        "App_iOS",
+        "Framework_iOS"
+      ]
+    }
+  },
+  "configFiles" : {
+    "Test Debug" : "Configs\/config.xcconfig"
+  },
+  "configs" : {
+    "Production Debug" : "debug",
+    "Production Release" : "release",
+    "Staging Debug" : "debug",
+    "Staging Release" : "release",
+    "Test Debug" : "debug",
+    "Test Release" : "release"
+  },
+  "fileGroups" : [
+    "Configs",
+    "FileGroup",
+    "SomeFile"
+  ],
+  "include" : [
+    "environments.yml"
+  ],
+  "name" : "Project",
+  "options" : {
+    "bundleIdPrefix" : "com.project",
+    "deploymentTarget" : {
+      "watchOS" : 4
+    },
+    "groupSortPosition" : "top",
+    "indentWidth" : 2,
+    "tabWidth" : 2,
+    "transitivelyLinkDependencies" : true,
+    "usesTabs" : false
+  },
+  "schemes" : {
+    "Framework" : {
+      "build" : {
+        "buildImplicitDependencies" : false,
+        "parallelizeBuild" : false,
+        "preActions" : [
+          {
+            "script" : "echo Starting Framework Build",
+            "settingsTarget" : "Framework_iOS"
+          }
+        ],
+        "targets" : {
+          "Framework_iOS" : "all"
+        }
+      },
+      "run" : {
+        "commandLineArguments" : {
+          "argument" : true,
+          "argument.with.dot" : true
+        }
+      }
+    }
+  },
+  "settings" : {
+    "configs" : {
+      "Staging" : {
+        "BUNDLE_ID_SUFFIX" : ".staging"
+      },
+      "Test" : {
+        "BUNDLE_ID_SUFFIX" : ".test"
+      }
+    }
+  },
+  "targets" : {
+    "App_iOS" : {
+      "attributes" : {
+        "ProvisioningStyle" : "Automatic"
+      },
+      "dependencies" : [
+        {
+          "target" : "Framework_iOS"
+        },
+        {
+          "target" : "StaticLibrary_ObjC_iOS"
+        },
+        {
+          "carthage" : "Result"
+        },
+        {
+          "target" : "Framework2_iOS",
+          "weak" : true
+        },
+        {
+          "target" : "App_watchOS"
+        },
+        {
+          "target" : "iMessageApp"
+        },
+        {
+          "framework" : "Vendor\/SomeFramework.framework"
+        }
+      ],
+      "entitlements" : {
+        "path" : "App_iOS\/App.entitlements",
+        "properties" : {
+          "com.apple.security.application-groups" : "group.com.app"
+        }
+      },
+      "platform" : "iOS",
+      "postbuildScripts" : [
+        {
+          "name" : "Strip Unused Architectures from Frameworks",
+          "path" : "scripts\/strip-frameworks.sh",
+          "runOnlyWhenInstalling" : true
+        },
+        {
+          "name" : "MyScript",
+          "script" : "echo \"You ran a script!\"\n"
+        }
+      ],
+      "scheme" : {
+        "commandLineArguments" : {
+          "MyDisabledArgument" : false,
+          "MyEnabledArgument" : true
+        },
+        "configVariants" : [
+          "Test",
+          "Staging",
+          "Production"
+        ],
+        "gatherCoverageData" : true,
+        "testTargets" : [
+          "App_iOS_Tests",
+          "App_iOS_UITests"
+        ]
+      },
+      "settings" : {
+        "INFOPLIST_FILE" : "App_iOS\/Info.plist",
+        "PRODUCT_BUNDLE_IDENTIFIER" : "com.project.app"
+      },
+      "sources" : [
+        "StandaloneFiles\/StandaloneAssets.xcassets",
+        {
+          "compilerFlags" : [
+            "-Werror"
+          ],
+          "excludes" : [
+            "**\/excluded-file",
+            "excluded-file"
+          ],
+          "name" : "App",
+          "path" : "App_iOS"
+        },
+        {
+          "path" : "StandaloneFiles\/Standalone.swift"
+        },
+        "FileGroup\/UnderFileGroup",
+        "Resources\/MyBundle.bundle",
+        {
+          "path" : "Resources\/ResourceFolder",
+          "type" : "folder"
+        },
+        {
+          "buildPhase" : "none",
+          "path" : "Folder",
+          "type" : "folder"
+        },
+        {
+          "buildPhase" : "none",
+          "path" : "Mintfile",
+          "type" : "file"
+        },
+        {
+          "buildPhase" : {
+            "copyFiles" : {
+              "destination" : "productsDirectory",
+              "subpath" : "include\/$(PRODUCT_NAME)"
+            }
+          },
+          "path" : "CopyFiles"
+        }
+      ],
+      "type" : "application"
+    },
+    "App_iOS_Tests" : {
+      "dependencies" : [
+        {
+          "target" : "App_iOS"
+        }
+      ],
+      "platform" : "iOS",
+      "sources" : "App_iOS_Tests",
+      "type" : "bundle.unit-test"
+    },
+    "App_iOS_UITests" : {
+      "dependencies" : [
+        {
+          "target" : "App_iOS"
+        }
+      ],
+      "platform" : "iOS",
+      "sources" : "App_iOS_UITests",
+      "type" : "bundle.ui-testing"
+    },
+    "App_macOS" : {
+      "attributes" : {
+        "ProvisioningStyle" : "Automatic"
+      },
+      "dependencies" : [
+        {
+          "target" : "Framework_macOS"
+        },
+        {
+          "target" : "XPC Service"
+        }
+      ],
+      "info" : {
+        "path" : "App_macOS\/Info.plist",
+        "properties" : {
+          "CFBundleIconFile" : "",
+          "CustomSetting" : "$CUSTOM_SETTING",
+          "LSMinimumSystemVersion" : "$(MACOSX_DEPLOYMENT_TARGET)",
+          "NSMainStoryboardFile" : "Main",
+          "NSPrincipalClass" : "NSApplication"
+        }
+      },
+      "platform" : "macOS",
+      "sources" : [
+        {
+          "path" : "App_macOS"
+        },
+        {
+          "path" : "StandaloneFiles\/Standalone.swift"
+        },
+        {
+          "path" : "Vendor\/SomeXPCService.xpc"
+        }
+      ],
+      "type" : "application"
+    },
+    "App_watchOS" : {
+      "dependencies" : [
+        {
+          "target" : "App_watchOS Extension"
+        }
+      ],
+      "deploymentTarget" : 3,
+      "platform" : "watchOS",
+      "settings" : {
+        "PRODUCT_BUNDLE_IDENTIFIER" : "com.project.app.watch"
+      },
+      "sources" : "App_watchOS",
+      "templates" : [
+        "MyTemplate"
+      ],
+      "type" : "application.watchapp2"
+    },
+    "App_watchOS Extension" : {
+      "dependencies" : [
+        {
+          "carthage" : "Result"
+        }
+      ],
+      "platform" : "watchOS",
+      "settings" : {
+        "PRODUCT_BUNDLE_IDENTIFIER" : "com.project.app.watch.extension"
+      },
+      "sources" : "App_watchOS Extension",
+      "type" : "watchkit2-extension"
+    },
+    "Framework" : {
+      "dependencies" : [
+        {
+          "carthage" : "Result"
+        },
+        {
+          "target" : "StaticLibrary_ObjC_$platform"
+        }
+      ],
+      "platform" : [
+        "iOS",
+        "tvOS",
+        "watchOS",
+        "macOS"
+      ],
+      "postbuildScripts" : [
+        {
+          "name" : "MyScript",
+          "path" : "scripts\/script.sh"
+        }
+      ],
+      "sources" : [
+        {
+          "excludes" : [
+            "*.xcodeproj"
+          ],
+          "path" : "Framework"
+        },
+        {
+          "buildPhase" : "headers",
+          "headerVisibility" : "public",
+          "path" : "Headers",
+          "type" : "folder"
+        }
+      ],
+      "type" : "framework"
+    },
+    "Framework2" : {
+      "platform" : [
+        "iOS",
+        "tvOS",
+        "watchOS",
+        "macOS"
+      ],
+      "sources" : [
+        {
+          "excludes" : [
+            "*.xcodeproj"
+          ],
+          "path" : "Framework"
+        }
+      ],
+      "type" : "framework"
+    },
+    "iMessageApp" : {
+      "dependencies" : [
+        {
+          "target" : "iMessageExtension"
+        }
+      ],
+      "platform" : "iOS",
+      "scheme" : {
 
-'
-    scheme:
-      commandLineArguments:
-        MyDisabledArgument: false
-        MyEnabledArgument: true
-      gatherCoverageData: true
-      testTargets:
-      - App_iOS_Tests
-      - App_iOS_UITests
-    settings:
-      INFOPLIST_FILE: App_iOS/Info.plist
-      PRODUCT_BUNDLE_IDENTIFIER: com.project.app
-    sources:
-    - StandaloneFiles/StandaloneAssets.xcassets
-    - compilerFlags:
-      - -Werror
-      excludes:
-      - '**/excluded-file'
-      - excluded-file
-      name: App
-      path: App_iOS
-    - path: StandaloneFiles/Standalone.swift
-    - FileGroup/UnderFileGroup
-    - Resources/MyBundle.bundle
-    - path: Resources/ResourceFolder
-      type: folder
-    - buildPhase: none
-      path: Folder
-      type: folder
-    - buildPhase: none
-      path: Mintfile
-      type: file
-    - buildPhase:
-        copyFiles:
-          destination: productsDirectory
-          subpath: include/$(PRODUCT_NAME)
-      path: CopyFiles
-    type: application
-  App_iOS_Tests:
-    dependencies:
-    - target: App_iOS
-    platform: iOS
-    sources: App_iOS_Tests
-    type: bundle.unit-test
-  App_iOS_UITests:
-    dependencies:
-    - target: App_iOS
-    platform: iOS
-    sources: App_iOS_UITests
-    type: bundle.ui-testing
-  App_macOS:
-    attributes:
-      ProvisioningStyle: Automatic
-    dependencies:
-    - target: Framework_macOS
-    - target: XPC Service
-    platform: macOS
-    sources:
-    - path: StandaloneFiles/Standalone.swift
-    - path: Vendor/SomeXPCService.xpc
-    type: application
-  App_watchOS:
-    dependencies:
-    - target: App_watchOS Extension
-    deploymentTarget: 3e+0
-    platform: watchOS
-    settings:
-      PRODUCT_BUNDLE_IDENTIFIER: com.project.app.watch
-    sources: App_watchOS
-    templates:
-    - MyTemplate
-    type: application.watchapp2
-  App_watchOS Extension:
-    dependencies:
-    - carthage: Alamofire
-    platform: watchOS
-    settings:
-      PRODUCT_BUNDLE_IDENTIFIER: com.project.app.watch.extension
-    sources: App_watchOS Extension
-    type: watchkit2-extension
-  Framework:
-    dependencies:
-    - carthage: Alamofire
-    - target: StaticLibrary_ObjC
-    platform:
-    - iOS
-    - tvOS
-    - watchOS
-    - macOS
-    postbuildScripts:
-    - name: MyScript
-      path: scripts/script.sh
-    sources:
-    - excludes:
-      - '*.xcodeproj'
-      path: Framework
-    - buildPhase: headers
-      headerVisibility: public
-      path: Headers
-      type: folder
-    type: framework
-  Legacy:
-    legacy:
-      passSettings: true
-      toolPath: /usr/bin/true
-    platform: iOS
-    type: 
-  StaticLibrary_ObjC:
-    platform: iOS
-    sources: StaticLibrary_ObjC
-    type: library.static
-  StaticLibrary_Swift:
-    platform: iOS
-    sources: StaticLibrary_Swift
-    type: library.static
-  XPC Service:
-    platform: macOS
-    sources:
-    - path: XPC Service
-    type: xpc-service
-  iMessageApp:
-    dependencies:
-    - target: iMessageExtension
-    platform: iOS
-    scheme: {}
-    sources: iMessage
-    type: application.messages
-  iMessageExtension:
-    platform: iOS
-    settings:
-      PRODUCT_BUNDLE_IDENTIFIER: com.project.iMessageApp.extension
-    sources: iMessage MessagesExtension
-    type: app-extension.messages
+      },
+      "sources" : "iMessage",
+      "type" : "application.messages"
+    },
+    "iMessageExtension" : {
+      "platform" : "iOS",
+      "settings" : {
+        "PRODUCT_BUNDLE_IDENTIFIER" : "com.project.iMessageApp.extension"
+      },
+      "sources" : "iMessage MessagesExtension",
+      "type" : "app-extension.messages"
+    },
+    "Legacy" : {
+      "legacy" : {
+        "passSettings" : true,
+        "toolPath" : "\/usr\/bin\/true"
+      },
+      "platform" : "iOS",
+      "type" : ""
+    },
+    "StaticLibrary_ObjC" : {
+      "platform" : [
+        "iOS",
+        "tvOS",
+        "watchOS",
+        "macOS"
+      ],
+      "sources" : "StaticLibrary_ObjC",
+      "type" : "library.static"
+    },
+    "StaticLibrary_Swift" : {
+      "platform" : "iOS",
+      "sources" : "StaticLibrary_Swift",
+      "type" : "library.static"
+    },
+    "XPC Service" : {
+      "platform" : "macOS",
+      "sources" : [
+        {
+          "path" : "XPC Service"
+        }
+      ],
+      "type" : "xpc-service"
+    }
+  },
+  "targetTemplates" : {
+    "MyTemplate" : {
+      "scheme" : {
 
+      }
+    }
+  }
+}
 
 # FILES
 App_iOS
@@ -225,6 +410,7 @@ App_iOS_UITests
 App_iOS_UITests/Info.plist
 App_iOS_UITests/TestProjectUITests.swift
 App_iOS/.DS_Store
+App_iOS/App.entitlements
 App_iOS/AppDelegate.swift
 App_iOS/Assets.xcassets
 App_iOS/Assets.xcassets/AppIcon.appiconset
@@ -237,6 +423,7 @@ App_iOS/Base.lproj/Localizable.strings
 App_iOS/Base.lproj/Localizable.stringsdict
 App_iOS/Base.lproj/LocalizedStoryboard.storyboard
 App_iOS/Base.lproj/Main.storyboard
+App_iOS/EmptyGroup
 App_iOS/en.lproj
 App_iOS/en.lproj/Localizable.strings
 App_iOS/en.lproj/Localizable.stringsdict
@@ -253,6 +440,16 @@ App_iOS/Model.xcdatamodeld/Model.xcdatamodel
 App_iOS/Model.xcdatamodeld/Model.xcdatamodel/contents
 App_iOS/module.modulemap
 App_iOS/ViewController.swift
+App_macOS
+App_macOS/AppDelegate.swift
+App_macOS/Assets.xcassets
+App_macOS/Assets.xcassets/AppIcon.appiconset
+App_macOS/Assets.xcassets/AppIcon.appiconset/Contents.json
+App_macOS/Assets.xcassets/Contents.json
+App_macOS/Base.lproj
+App_macOS/Base.lproj/Main.storyboard
+App_macOS/Info.plist
+App_macOS/ViewController.swift
 App_watchOS
 App_watchOS Extension
 App_watchOS Extension/Assets.xcassets
